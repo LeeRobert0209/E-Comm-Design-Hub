@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能设计工作台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="main-container">
+        <header>
+            <h1>智能设计工作台</h1>
+            <p>一个集数据处理与资产处理于一体的智能助手</p>
+            <div style="margin-top: 10px;">
+                <a href="{{ url_for('clear_session') }}" class="clear-link">[ 清空选项记忆 ]</a>
+
+                <button id="test-connection-btn" class="test-link" data-url="{{ url_for('test_connection') }}">[ 测试网络连接 ]</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-link active" onclick="openTab(event, 'data-processor')">Step 1: 数据处理器</button>
+            <button class="tab-link" onclick="openTab(event, 'slice-processor')">Step 2: 切图处理器</button>
+            <button class="tab-link" onclick="openTab(event, 'image-downloader')">Step 3: 素材下载器</button>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="padding: 20px 30px 0;">
+            {% for category, message in messages %}
+            <div class="flash-message {{ category }}">{{ message | safe }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div id="data-processor" class="tab-content" style="display: block;">
+            
+            <!-- Sub-Tabs for Dual Mode -->
+            <div class="sub-tabs">
+                <button class="sub-tab-link active" onclick="openSubTab(event, 'mode-a-cloud')">Mode A: 云端链接模式</button>
+                <button class="sub-tab-link" onclick="openSubTab(event, 'mode-b-local')">Mode B: 数据粘贴模式</button>
+                <button class="sub-tab-link" onclick="openSubTab(event, 'mode-legacy')">旧版: 文件上传模式</button>
+            </div>
+
+            <!-- Mode A: Cloud Sync -->
+            <div id="mode-a-cloud" class="sub-tab-content" style="display: block;">
+                <div class="mode-description">
+                    <h3>☁️ 云端实时回填模式</h3>
+                    <p>适用于：数据已在 Google Sheet 中，只需补全图片链接。程序将直接读取表格并回填 H/I 列。</p>
+                </div>
+                <form id="cloud-sync-form" data-upload-url="{{ url_for('process_cloud_sync') }}"
+                    data-status-url-base="{{ url_for('task_status', task_id='_TASK_ID_') }}">
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="cloud-project-type">1. 选择项目类型</label>
+                            <select name="project_type" id="cloud-project-type" required>
+                                <option value="" disabled selected>-- 请选择 --</option>
+                                {% for key, value in config.items() %}
+                                <option value="{{ key }}">{{ value.display_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="cloud-gsheet-url">2. 粘贴 Google Sheet 链接 (确保已开放编辑权限)</label>
+                            <input type="text" id="cloud-gsheet-url" name="gsheet_url"
+                                placeholder="https://docs.google.com/spreadsheets/d/..." required>
+                        </div>
+                    </fieldset>
+                    <button type="submit" class="primary-btn">🔄 开始云端同步</button>
+                </form>
+                <div id="cloud-progress-area" style="display: none; margin-top: 20px;">
+                    <p id="cloud-progress-status">任务正在进行中...</p>
+                    <div class="progress-bar-container">
+                        <div id="cloud-progress-bar" class="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode B: Local Paste -->
+            <div id="mode-b-local" class="sub-tab-content" style="display: none;">
+                <div class="mode-description">
+                    <h3>📋 本地数据粘贴模式</h3>
+                    <p>适用于：数据错乱或新品牌。直接粘贴 Excel 数据 (TSV格式)，程序将生成带图片链接的新 Excel。</p>
+                </div>
+                <form id="local-paste-form" data-upload-url="{{ url_for('process_local_paste') }}"
+                    data-status-url-base="{{ url_for('task_status', task_id='_TASK_ID_') }}">
+                    <fieldset>
+                         <div class="form-group">
+                            <label for="paste-project-type">1. 选择项目类型</label>
+                            <select name="project_type" id="paste-project-type" required>
+                                <option value="" disabled selected>-- 请选择 --</option>
+                                {% for key, value in config.items() %}
+                                <option value="{{ key }}">{{ value.display_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pasted-text">2. 粘贴 Excel 数据 (包含表头)</label>
+                            <textarea id="pasted-text" name="pasted_text" rows="10" placeholder="复制 Excel 中的数据区域并将它们粘贴到这里..." required></textarea>
+                        </div>
+                    </fieldset>
+                    <button type="submit" class="primary-btn">🚀 处理并生成 Excel</button>
+                </form>
+                <div id="paste-progress-area" style="display: none; margin-top: 20px;">
+                    <p id="paste-progress-status">任务正在进行中...</p>
+                    <div class="progress-bar-container">
+                        <div id="paste-progress-bar" class="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legacy Mode (Original) -->
+            <div id="mode-legacy" class="sub-tab-content" style="display: none;">
+                <div class="mode-description">
+                     <h3>📂 标准流程模式</h3>
+                     <p>适用于：标准的运营 Excel 画板文件。</p>
+                </div>
+                <form id="data-form" data-upload-url="{{ url_for('upload_file') }}"
+                    data-status-url-base="{{ url_for('task_status', task_id='_TASK_ID_') }}">
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="project-type">1. 选择项目类型</label>
+                            <select name="project_type" id="project-type" required>
+                                <option value="" disabled {% if not project_type %}selected{% endif %}>-- 请选择 --</option>
+                                {% for key, value in config.items() %}
+                                <option value="{{ key }}" {% if key==project_type %}selected{% endif %}>{{
+                                    value.display_name }}</option>
+                                {% endfor %}
+                            </select>
+                             <div id="template-download-area" style="display: none; margin-top: 10px;">
+                                <a id="template-link" href="#" class="template-link">下载此项目的标准Excel模板</a>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="gsheet-url">2. 粘贴目标 Google Sheet 链接</label>
+                            <input type="text" id="gsheet-url" name="gsheet_url"
+                                placeholder="https://docs.google.com/spreadsheets/d/..." value="{{ gsheet_url or '' }}"
+                                required>
+                        </div>
+                        <div class="upload-area" id="excel-drop-zone">
+                            <label for="excel-file-input">3. 点击或拖拽原始 Excel 文件到此处</label>
+                            <input type="file" name="file" id="excel-file-input" accept=".xlsx, .xls" required>
+                            <p id="excel-file-name"></p>
+                        </div>
+                    </fieldset>
+                    <button type="submit">开始处理并更新</button>
+                </form>
+                <div id="progress-area" style="display: none; margin-top: 20px;">
+                    <p id="progress-status">任务正在进行中...</p>
+                    <div class="progress-bar-container">
+                        <div id="progress-bar" class="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="slice-processor" class="tab-content" style="display: none;">
+            <h2 class="tool-title">Figma切图智能处理</h2>
+            <p class="tool-description">上传从Figma导出的切图ZIP包，自动完成压缩和序列化重命名。</p>
+            <form id="slice-form" data-upload-url="{{ url_for('process_slices') }}"
+                data-status-url-base="{{ url_for('task_status', task_id='_TASK_ID_') }}">
+                <fieldset>
+                    <div class="upload-area" id="zip-drop-zone">
+                        <label for="zip-file-input">点击或拖拽切图 .zip 压缩包到此处</label>
+                        <input type="file" name="zip_file" id="zip-file-input" accept=".zip" required>
+                        <p id="zip-file-name"></p>
+                    </div>
+                </fieldset>
+                <button type="submit">开始处理并下载</button>
+            </form>
+            <div id="slice-progress-area" style="display: none; margin-top: 20px;">
+                <p id="slice-progress-status">任务正在进行中...</p>
+                <div class="progress-bar-container">
+                    <div id="slice-progress-bar" class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="image-downloader" class="tab-content" style="display: none;">
+            <h2 class="tool-title">浪琴 Image Bank 自动化下载</h2>
+            <p class="tool-description">输入型号SKU，从Image Bank自动下载5张JPG主图并打包。</p>
+            <form id="image-download-form" data-upload-url="{{ url_for('download_images') }}"
+                data-status-url-base="{{ url_for('task_status', task_id='_TASK_ID_') }}">
+                <fieldset>
+                    <div class="form-group">
+                        <label for="model-sku">1. 输入目标产品SKU (带点格式, 如 L8.124.4.87.2)</label>
+                        <input type="text" id="model-sku" name="model_sku" placeholder="L8.124.4.87.2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="zip-filename">2. (可选) 指定下载的 ZIP 文件名</label>
+                        <input type="text" id="zip-filename" name="zip_filename" placeholder="留空则使用SKU命名">
+                    </div>
+                </fieldset>
+                <button type="submit">开始下载</button>
+            </form>
+            <div id="image-download-progress-area" style="display: none; margin-top: 20px;">
+                <p id="image-download-progress-status">下载任务正在进行中...</p>
+                <div class="progress-bar-container">
+                    <div id="image-download-progress-bar" class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

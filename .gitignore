@@ -1,0 +1,39 @@
+# --- 环境配置 ---
+# 忽略包含你本地真实路径的配置文件和敏感凭证
+config.ini
+config.json
+credentials.json
+token.json
+.env
+
+# --- Python 缓存 ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# --- IDE 配置文件 ---
+.vscode/
+.idea/
+*.swp
+
+# --- 业务数据 ---
+# 忽略本地生成的临时 Excel 或测试数据以及压缩包
+*.xlsx
+*.xls
+*.zip
+!config.ini.example
+
+# --- 运行时生成 ---
+# 忽略上传和输出目录中的内容，但保留目录本身
+uploads/*
+!uploads/.gitkeep
+outputs/*
+!outputs/.gitkeep
+*.log
+
+# --- 其他 ---
+test_google_sheet.py
+test_app.py

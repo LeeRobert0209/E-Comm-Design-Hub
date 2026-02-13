@@ -1,0 +1,20 @@
+{
+    "example_project": {
+        "display_name": "示例项目 (Example Project)",
+        "drive_folder": "Your_Drive_Folder_Name",
+        "processor": "excel_processor",
+        "required_sheets": [
+            "Sheet1",
+            "Details"
+        ],
+        "required_columns": {
+            "Sheet1": [
+                "SKU",
+                "Price",
+                "Description"
+            ]
+        },
+        "template_file": "example_template.xlsx",
+        "header_row": 0
+    }
+}

@@ -1,0 +1,298 @@
+/* static/css/style.css (V3 - Final Polished Version) */
+
+:root {
+    --primary-color: #4A90E2;
+    --primary-hover: #357ABD;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --background-color: #f4f7f9;
+    --card-background: #ffffff;
+    --text-color: #333;
+    --text-light: #555;
+    --border-color: #dee2e6;
+}
+
+body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 720px;
+    background: var(--card-background);
+    border-radius: 16px;
+    /* --- 核心修正：修复了box-shadow的笔误，并使用了更柔和的参数 --- */
+    box-shadow: 0 10px 40px rgba(44, 62, 80, 0.1);
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+}
+
+header {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, #3a3a60, #2c3e50);
+    color: white;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 5px 0 0;
+    opacity: 0.8;
+}
+
+.clear-link {
+    font-size: 13px;
+    color: #a7c8e8;
+    text-decoration: none;
+}
+
+.clear-link:hover {
+    text-decoration: underline;
+}
+
+.tabs {
+    display: flex;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-link {
+    flex: 1;
+    padding: 15px 20px;
+    text-align: center;
+    background: none;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent;
+}
+
+.tab-link:hover {
+    background-color: #e9ecef;
+}
+
+.tab-link.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    padding: 30px;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tool-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.tool-description {
+    font-size: 14px;
+    margin-bottom: 25px;
+    color: var(--text-light);
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.form-group:focus-within label {
+    color: var(--primary-color);
+}
+
+input[type="text"],
+select {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+select {
+    appearance: none;
+    background-color: white;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 10px;
+}
+
+input[type="text"]:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+.upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #fafafa;
+}
+
+.upload-area.drag-over,
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background-color: #f0f8ff;
+}
+
+.upload-area label {
+    color: var(--primary-color);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+#excel-file-name,
+#zip-file-name {
+    margin-top: 10px;
+    color: var(--text-light);
+    font-size: 12px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+button[type="submit"]:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+button[type="submit"]:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.flash-message {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: var(--error-color);
+}
+
+.success {
+    background-color: #d4edda;
+    color: var(--success-color);
+}
+
+.template-link {
+    font-size: 13px;
+    text-decoration: none;
+    color: var(--primary-hover);
+}
+
+.template-link:hover {
+    text-decoration: underline;
+}
+
+#progress-status {
+    font-weight: 500;
+    transition: color 0.5s ease;
+}
+
+#progress-status.success {
+    color: var(--success-color);
+}
+
+#progress-status.error {
+    color: var(--error-color);
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: 4px;
+    transition: width 0.5s ease-in-out, background-color 0.5s ease;
+}
+
+.progress-bar.success {
+    background-color: var(--success-color);
+}
+
+.progress-bar.error {
+    background-color: var(--error-color);
+}
